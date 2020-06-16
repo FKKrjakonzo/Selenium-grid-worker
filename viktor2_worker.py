@@ -21,6 +21,7 @@ WEBPAGE = 'XXXXXX'
 Inputs - user URL, Data, Position ID in datafile.
 """
 def single_user_edit(vybrany, data, pos):
+
     error = ''
     last = []
     last.append(data[-1] + '$')
@@ -29,12 +30,7 @@ def single_user_edit(vybrany, data, pos):
                                 executable_path=r'C:\geckodriver\geckodriver.exe'
                                 )
     browser.set_page_load_timeout(50)
-
-    t = threading.Thread(target=functions.login(browser))
-    t.start()
-
-    while t.isAlive():
-        pass
+    functions.login(browser)
 
     try:
         url = WEBPAGE + vybrany[len(vybrany) - 1]
@@ -108,20 +104,16 @@ def single_user_edit(vybrany, data, pos):
                 try:
                     Select(frame).select_by_value(str(data[len(values_single)
                             + u]))
-                except Exception, e:
-                    print e
+                except:
                     if '.Fail_1_in_' not in error:
                         error += '.Fail_1_in_' + str(pos)
 
         frame = browser.find_element_by_class_name('btn-blue')
         frame.click()
-    except Exception, e:
-
-        print e
+    except:
         browser.quit()
         return '---FAIL ' + str(data[-1]) + ','
     error += '---SUCCESS' + str(data[-1]) + ','
     browser.quit()
     last.append(error)
-    print error
     return last

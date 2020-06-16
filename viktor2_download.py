@@ -1,14 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import pandas as pd
-import wget
-import zipfile
-import os
-from os import listdir
-from os.path import isfile, join
-import shutil
-
-WEBSITE = 'XXXXXXXXX'
+from urllib.request import urlopen
+from zipfile import ZipFile
+from io import BytesIO;
+WEBSITE = 'XXXXX'
 
 """Download ZIP with updated files
 """
@@ -38,30 +34,10 @@ def download():
         'v': str,
         'w': str,
         }
-    try:
-        os.remove('VIKTOR_Carkulka.zip')
-        shutil.rmtree('VIKTOR_Carkulka')
-    except:
-        pass
-
-    try:
-        wget.download(WEBSITE)
-    except:
-        return '$Failed downloading'
-    with zipfile.ZipFile('VIKTOR_Carkulka.zip', 'r') as zip_ref:
-        zip_ref.extractall()
-
-    fileDir = os.path.dirname(os.path.realpath('__file__'))
-
-    mypath = os.path.join(fileDir,
-                          'VIKTOR_Carkulka/UPRAVA_UZIVATELOV.xlsx')
-
-    xlsx = pd.read_excel(mypath, sheet_name=0, dtype=str,
+    resp = urlopen(WEBSITE)
+    zipfile = ZipFile(BytesIO(resp.read()))
+    obj = zipfile.open('VIKTOR_Carkulka/UPRAVA_UZIVATELOV.xlsx')
+    xlsx = pd.read_excel(obj, sheet_name=0, dtype=str,
                          na_filter=False)
-
-    sheet1 = xlsx
-    sheet1.fillna('', inplace=True)
-
-    sheet1 = sheet1.values.tolist()
-
-    return sheet1
+    xlsx.fillna('', inplace=True)
+    return xlsx.values.tolist()
